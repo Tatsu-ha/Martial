@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0b0908">
+  <meta name="description" content="Iron Lotus — a tactical martial arts card combat game. Read the body. Break the will.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b0908'/%3E%3Ctext x='32' y='47' font-size='40' text-anchor='middle' fill='%23d6a94a'%3E%E5%8D%8D%3C/text%3E%3C/svg%3E">
+  <title>IRON LOTUS — Tactical Martial Arts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="arena" aria-label="Martial arts combat arena"></canvas>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header id="topbar" class="topbar">
+      <button class="brand" id="brandBtn" aria-label="Main menu">
+        <span class="brand-mark">卍</span>
+        <span class="brand-text">IRON <em>LOTUS</em></span>
+      </button>
+      <div class="topbar-right">
+        <button class="nav-btn" data-nav="campaign">CAMPAIGN</button>
+        <button class="nav-btn" data-nav="deck">DECK</button>
+        <button class="nav-btn" data-nav="dojo">DOJO</button>
+        <button class="icon-btn" id="soundBtn" aria-label="Toggle sound" title="Toggle sound">♪</button>
+        <div class="profile-chip" id="profileChip">
+          <span class="pc-level">LV 1</span>
+          <span class="pc-xp"><i></i></span>
+          <span class="pc-essence">◆ 0</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="screens">
+      <!-- ============ MAIN MENU ============ -->
+      <section id="screen-menu" class="screen menu-screen">
+        <div class="menu-copy">
+          <div class="eyebrow"><span></span> A TACTICAL MARTIAL ARTS DUEL <span></span></div>
+          <h1 class="title">IRON<br><em>LOTUS</em></h1>
+          <p class="title-sub">EVERY BREATH. EVERY BONE. EVERY CHOICE.</p>
+          <p class="menu-blurb">Six styles. Fifty techniques. One body that remembers every strike. Read the opponent, break the structure, and end the fight before they end you.</p>
+          <div class="menu-actions">
+            <button class="btn btn-primary" id="menuStart">ENTER THE DOJO <span>→</span></button>
+            <button class="btn btn-ghost" id="menuHow">HOW TO PLAY</button>
+          </div>
+          <div class="menu-meta" id="menuMeta">
+            <div><strong>6</strong><span>FIGHTING STYLES</span></div>
+            <div><strong>50</strong><span>TECHNIQUES</span></div>
+            <div><strong>8</strong><span>BODY ZONES</span></div>
+          </div>
+        </div>
+        <div class="menu-scroll">SCROLL THE PATH · PRESS ENTER</div>
+      </section>
+
+      <!-- ============ MODES ============ -->
+      <section id="screen-modes" class="screen hidden">
+        <div class="page-wrap">
+          <div class="page-head">
+            <button class="back-btn" data-back>← BACK</button>
+            <div>
+              <div class="eyebrow"><span></span> THE PATH OF THE EMPTY HAND</div>
+              <h2 class="page-title">CHOOSE YOUR <em>PATH</em></h2>
+            </div>
+            <div class="page-head-right" id="modeProfile"></div>
+          </div>
+          <div class="modes-layout">
+            <div class="mode-grid" id="modeGrid"></div>
+            <aside class="campaign-panel">
+              <div class="panel-label">CAMPAIGN LADDER</div>
+              <h3>The Iron Lotus Circuit</h3>
+              <p class="panel-sub">Six gatekeepers stand between you and the Hollow Palm. Each one knows a different way to break a body.</p>
+              <div class="ladder" id="campaignLadder"></div>
+            </aside>
+          </div>
+          <div class="quick-row">
+            <button class="quick-card" data-nav="deck"><span class="q-icon">▤</span><div><strong>DECK BUILDER</strong><span>Customize your technique hand</span></div></button>
+            <button class="quick-card" data-nav="dojo"><span class="q-icon">☯</span><div><strong>THE DOJO</strong><span>Level up, learn perks, spend essence</span></div></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ COMBAT ============ -->
+      <section id="screen-combat" class="screen hidden">
+        <div class="combat-top">
+          <div class="turn-badge" id="turnBadge">
+            <span class="tb-round">ROUND <b id="roundNum">1</b></span>
+            <span class="tb-phase" id="phaseText">YOUR MOVE</span>
+          </div>
+        </div>
+        <button class="icon-btn retreat" id="retreatBtn" title="Retreat from fight" aria-label="Retreat from fight">✕</button>
+
+        <div class="fighter-hud player-hud" id="playerHud">
+          <div class="hud-head">
+            <div class="portrait" id="playerPortrait"></div>
+            <div class="hud-id">
+              <div class="hud-name" id="playerName">KAI</div>
+              <div class="hud-style" id="playerStyle">SHAOLIN KUNG FU</div>
+            </div>
+            <div class="stance-pill" id="playerStance">STANCE</div>
+          </div>
+          <div class="bars">
+            <div class="bar-row health"><span class="bar-label">HP</span><div class="bar"><i id="playerHpBar"></i><b id="playerHpGhost"></b></div><span class="bar-num" id="playerHpNum">110</span></div>
+            <div class="bar-row stamina"><span class="bar-label">STA</span><div class="bar"><i id="playerStaBar"></i></div><span class="bar-num" id="playerStaNum">100</span></div>
+            <div class="chi-row"><span class="bar-label">CHI</span><div class="pips" id="playerChi"></div><span class="chi-focus" id="playerFocus"></span></div>
+          </div>
+          <div class="hud-body">
+            <div class="body-figure" id="playerBody"></div>
+            <div class="body-legend">
+              <div class="legend-title">BODY INTEGRITY</div>
+              <div class="part-list" id="playerParts"></div>
+            </div>
+          </div>
+          <div class="status-row" id="playerStatus"></div>
+        </div>
+
+        <div class="fighter-hud enemy-hud" id="enemyHud">
+          <div class="hud-head">
+            <div class="stance-pill" id="enemyStance">OPPONENT</div>
+            <div class="hud-id right">
+              <div class="hud-name" id="enemyName">ROOK</div>
+              <div class="hud-style" id="enemyStyle">SHOTOKAN</div>
+            </div>
+            <div class="portrait" id="enemyPortrait"></div>
+          </div>
+          <div class="bars">
+            <div class="bar-row health"><span class="bar-num" id="enemyHpNum">92</span><div class="bar"><i id="enemyHpBar"></i><b id="enemyHpGhost"></b></div><span class="bar-label">HP</span></div>
+            <div class="bar-row stamina"><span class="bar-num" id="enemyStaNum">100</span><div class="bar"><i id="enemyStaBar"></i></div><span class="bar-label">STA</span></div>
+            <div class="chi-row"><span class="chi-focus" id="enemyFocus"></span><div class="pips" id="enemyChi"></div><span class="bar-label">CHI</span></div>
+          </div>
+          <div class="hud-body right">
+            <div class="body-legend">
+              <div class="legend-title">BODY INTEGRITY</div>
+              <div class="part-list" id="enemyParts"></div>
+            </div>
+            <div class="body-figure" id="enemyBody"></div>
+          </div>
+          <div class="status-row right" id="enemyStatus"></div>
+        </div>
+
+        <div class="combat-log" id="combatLog">
+          <div class="log-head">COMBAT LOG <span id="logToggle">−</span></div>
+          <div class="log-entries" id="logEntries"></div>
+        </div>
+
+        <div class="hand-area" id="handArea">
+          <div class="hand-top">
+            <div class="energy-readout" id="energyReadout">
+              <span class="energy-icon">气</span>
+              <div><strong id="energyNum">3 / 5</strong><span>CHI</span></div>
+            </div>
+            <div class="deck-readout">
+              <span id="deckCount">DECK 15</span>
+              <span id="discardCount">DISCARD 0</span>
+            </div>
+            <div class="hand-hint" id="handHint">SELECT A TECHNIQUE</div>
+            <button class="btn btn-end" id="endTurnBtn">END TURN <span>⏎</span></button>
+          </div>
+          <div class="hand" id="hand"></div>
+          <div class="hand-empty hidden" id="handEmpty">No techniques. End your turn.</div>
+        </div>
+
+        <div class="incoming-banner hidden" id="incomingBanner">
+          <span class="incoming-label">INCOMING</span>
+          <strong id="incomingName"></strong>
+          <span class="incoming-part" id="incomingPart"></span>
+        </div>
+      </section>
+
+      <!-- ============ DECK ============ -->
+      <section id="screen-deck" class="screen hidden">
+        <div class="page-wrap wide">
+          <div class="page-head">
+            <button class="back-btn" data-back>← BACK</button>
+            <div>
+              <div class="eyebrow"><span></span> YOUR ARSENAL</div>
+              <h2 class="page-title">TECHNIQUE <em>CODEX</em></h2>
+            </div>
+            <div class="deck-head-actions">
+              <button class="btn btn-small btn-ghost" id="autoDeck">AUTO-BUILD</button>
+              <div class="deck-count-box"><strong id="deckSize">18</strong><span>/ 30 CARDS</span></div>
+            </div>
+          </div>
+          <div class="deck-layout">
+            <div class="collection-panel">
+              <div class="filter-row" id="deckFilters"></div>
+              <div class="collection-grid" id="collectionGrid"></div>
+            </div>
+            <aside class="deck-panel">
+              <div class="panel-label">CURRENT DECK <span id="deckCountLabel">18</span></div>
+              <div class="deck-style-note" id="deckStyleNote"></div>
+              <div class="deck-list" id="deckList"></div>
+              <div class="deck-rules">Minimum 15 · Maximum 30<br>Cards upgrade with Essence in the codex.</div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ DOJO ============ -->
+      <section id="screen-dojo" class="screen hidden">
+        <div class="page-wrap wide">
+          <div class="page-head">
+            <button class="back-btn" data-back>← BACK</button>
+            <div>
+              <div class="eyebrow"><span></span> THE INNER COURT</div>
+              <h2 class="page-title">THE <em>DOJO</em></h2>
+            </div>
+            <div class="dojo-resources" id="dojoResources"></div>
+          </div>
+          <div class="dojo-layout">
+            <div class="dojo-left">
+              <div class="character-card" id="characterCard"></div>
+              <div class="attribute-panel" id="attributePanel"></div>
+            </div>
+            <div class="skill-panel">
+              <div class="panel-label">SKILL TREE <span id="skillPointsLabel">0 POINTS</span></div>
+              <div class="skill-tree" id="skillTree"></div>
+              <div class="skill-note">Perks are permanent. Choose a path and let the body remember.</div>
+            </div>
+            <div class="achievement-panel">
+              <div class="panel-label">ACHIEVEMENTS <span id="achCount"></span></div>
+              <div class="achievement-list" id="achievementList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="overlayRoot"></div>
+    <div id="toasts"></div>
+    <div id="tooltip" class="tooltip hidden"></div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
